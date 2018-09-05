@@ -28,7 +28,7 @@ will be called ahead of running any tests::
 
     # content of test_module.py
 
-    class TestHello:
+    class TestHello(object):
         @classmethod
         def callme(cls):
             print ("callme called!")
@@ -39,7 +39,7 @@ will be called ahead of running any tests::
         def test_method2(self):
             print ("test_method1 called")
 
-    class TestOther:
+    class TestOther(object):
         @classmethod
         def callme(cls):
             print ("callme other called")
@@ -59,7 +59,7 @@ will be called ahead of running any tests::
 
 If you run this without output capturing::
 
-    $ py.test -q -s test_module.py
+    $ pytest -q -s test_module.py
     callattr_ahead_of_alltests called
     callme called!
     callme other called

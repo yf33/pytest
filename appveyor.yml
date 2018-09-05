@@ -5,24 +5,49 @@ environment:
     # using pytestbot account as detailed here:
     # https://www.appveyor.com/docs/build-configuration#secure-variables
 
+  matrix:
+  # coveralls is not in the default env list
+  - TOXENV: "coveralls"
+  # note: please use "tox --listenvs" to populate the build matrix below
+  - TOXENV: "linting"
+  - TOXENV: "py27"
+  - TOXENV: "py34"
+  - TOXENV: "py35"
+  - TOXENV: "py36"
+  - TOXENV: "py37"
+  - TOXENV: "pypy"
+  - TOXENV: "py27-pexpect"
+  - TOXENV: "py27-xdist"
+  - TOXENV: "py27-trial"
+  - TOXENV: "py27-numpy"
+  - TOXENV: "py27-pluggymaster"
+  - TOXENV: "py36-pexpect"
+  - TOXENV: "py36-xdist"
+  - TOXENV: "py36-trial"
+  - TOXENV: "py36-numpy"
+  - TOXENV: "py36-pluggymaster"
+  - TOXENV: "py27-nobyte"
+  - TOXENV: "doctesting"
+  - TOXENV: "py36-freeze"
+  - TOXENV: "docs"
+
 install:
   - echo Installed Pythons
   - dir c:\Python*
 
-  # install pypy using choco (redirect to a file and write to console in case
-  # choco install returns non-zero, because choco install python.pypy is too
-  # noisy)
-  - choco install python.pypy > pypy-inst.log 2>&1 || (type pypy-inst.log & exit /b 1)
-  - set PATH=C:\tools\pypy\pypy;%PATH% # so tox can find pypy
-  - echo PyPy installed
-  - pypy --version
+  - if "%TOXENV%" == "pypy" call scripts\install-pypy.bat
 
-  - C:\Python35\python -m pip install tox
+  - C:\Python36\python -m pip install --upgrade --pre tox
 
 build: false  # Not a C# project, build stuff at the test step instead.
 
 test_script:
-  - C:\Python35\python -m tox
-  # coveralls is not in tox's envlist, plus for PRs the secure variable
-  # is not defined so we have to check for it
-  - if defined COVERALLS_REPO_TOKEN C:\Python35\python -m tox -e coveralls
+  - call scripts\call-tox.bat
+
+cache:
+  - '%LOCALAPPDATA%\pip\cache'
+  - '%USERPROFILE%\.cache\pre-commit'
+
+# We don't deploy anything on tags with AppVeyor, we use Travis instead, so we
+# might as well save resources
+skip_tags: true
