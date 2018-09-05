@@ -1,128 +1,122 @@
-import os
-import sys
+import os, sys
 import setuptools
 import pkg_resources
-from setuptools import setup
+from setuptools import setup, Command
 
-classifiers = [
-    "Development Status :: 6 - Mature",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: POSIX",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: MacOS :: MacOS X",
-    "Topic :: Software Development :: Testing",
-    "Topic :: Software Development :: Libraries",
-    "Topic :: Utilities",
-] + [
-    ("Programming Language :: Python :: %s" % x)
-    for x in "2 2.7 3 3.4 3.5 3.6 3.7".split()
-]
+classifiers = ['Development Status :: 6 - Mature',
+               'Intended Audience :: Developers',
+               'License :: OSI Approved :: MIT License',
+               'Operating System :: POSIX',
+               'Operating System :: Microsoft :: Windows',
+               'Operating System :: MacOS :: MacOS X',
+               'Topic :: Software Development :: Testing',
+               'Topic :: Software Development :: Libraries',
+               'Topic :: Utilities'] + [
+              ('Programming Language :: Python :: %s' % x) for x in
+                  '2 2.6 2.7 3 3.2 3.3 3.4 3.5'.split()]
 
-with open("README.rst") as fd:
+with open('README.rst') as fd:
     long_description = fd.read()
 
+def get_version():
+    p = os.path.join(os.path.dirname(
+                     os.path.abspath(__file__)), "_pytest", "__init__.py")
+    with open(p) as f:
+        for line in f.readlines():
+            if "__version__" in line:
+                return line.strip().split("=")[-1].strip(" '")
+    raise ValueError("could not read version")
 
-def get_environment_marker_support_level():
+
+def has_environment_marker_support():
     """
-    Tests how well setuptools supports PEP-426 environment marker.
+    Tests that setuptools has support for PEP-426 environment marker support.
 
     The first known release to support it is 0.7 (and the earliest on PyPI seems to be 0.7.2
-    so we're using that), see: https://setuptools.readthedocs.io/en/latest/history.html#id350
-
-    The support is later enhanced to allow direct conditional inclusions inside install_requires,
-    which is now recommended by setuptools. It first appeared in 36.2.0, went broken with 36.2.1, and
-    again worked since 36.2.2, so we're using that. See:
-    https://setuptools.readthedocs.io/en/latest/history.html#v36-2-2
-    https://github.com/pypa/setuptools/issues/1099
+    so we're using that), see: http://pythonhosted.org/setuptools/history.html#id142
 
     References:
 
-    * https://wheel.readthedocs.io/en/latest/index.html#defining-conditional-dependencies
+    * https://wheel.readthedocs.org/en/latest/index.html#defining-conditional-dependencies
     * https://www.python.org/dev/peps/pep-0426/#environment-markers
-    * https://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-platform-specific-dependencies
     """
     try:
-        version = pkg_resources.parse_version(setuptools.__version__)
-        if version >= pkg_resources.parse_version("36.2.2"):
-            return 2
-        if version >= pkg_resources.parse_version("0.7.2"):
-            return 1
+        return pkg_resources.parse_version(setuptools.__version__) >= pkg_resources.parse_version('0.7.2')
     except Exception as exc:
         sys.stderr.write("Could not test setuptool's version: %s\n" % exc)
-
-    # as of testing on 2018-05-26 fedora was on version 37* and debian was on version 33+
-    # we should consider erroring on those
-    return 0
+        return False
 
 
 def main():
+    install_requires = ['py>=1.4.29']  # pluggy is vendored in _pytest.vendored_packages
     extras_require = {}
-    install_requires = [
-        "py>=1.5.0",  # if py gets upgrade to >=1.6, remove _width_of_current_line in terminal.py
-        "six>=1.10.0",
-        "setuptools",
-        "attrs>=17.4.0",
-        "more-itertools>=4.0.0",
-        "atomicwrites>=1.0",
-    ]
-    # if _PYTEST_SETUP_SKIP_PLUGGY_DEP is set, skip installing pluggy;
-    # used by tox.ini to test with pluggy master
-    if "_PYTEST_SETUP_SKIP_PLUGGY_DEP" not in os.environ:
-        install_requires.append("pluggy>=0.7")
-    environment_marker_support_level = get_environment_marker_support_level()
-    if environment_marker_support_level >= 2:
-        install_requires.append('funcsigs;python_version<"3.0"')
-        install_requires.append('pathlib2>=2.2.0;python_version<"3.6"')
-        install_requires.append('colorama;sys_platform=="win32"')
-    elif environment_marker_support_level == 1:
-        extras_require[':python_version<"3.0"'] = ["funcsigs"]
-        extras_require[':python_version<"3.6"'] = ["pathlib2>=2.2.0"]
-        extras_require[':sys_platform=="win32"'] = ["colorama"]
+    if has_environment_marker_support():
+        extras_require[':python_version=="2.6" or python_version=="3.0" or python_version=="3.1"'] = ['argparse']
+        extras_require[':sys_platform=="win32"'] = ['colorama']
     else:
-        if sys.platform == "win32":
-            install_requires.append("colorama")
-        if sys.version_info < (3, 0):
-            install_requires.append("funcsigs")
-        if sys.version_info < (3, 6):
-            install_requires.append("pathlib2>=2.2.0")
+        if sys.version_info < (2, 7) or (3,) <= sys.version_info < (3, 2):
+            install_requires.append('argparse')
+        if sys.platform == 'win32':
+            install_requires.append('colorama')
 
     setup(
-        name="pytest",
-        description="pytest: simple powerful testing with Python",
+        name='pytest',
+        description='pytest: simple powerful testing with Python',
         long_description=long_description,
-        use_scm_version={"write_to": "src/_pytest/_version.py"},
-        url="https://docs.pytest.org/en/latest/",
-        project_urls={
-            "Source": "https://github.com/pytest-dev/pytest",
-            "Tracker": "https://github.com/pytest-dev/pytest/issues",
-        },
-        license="MIT license",
-        platforms=["unix", "linux", "osx", "cygwin", "win32"],
-        author=(
-            "Holger Krekel, Bruno Oliveira, Ronny Pfannschmidt, "
-            "Floris Bruynooghe, Brianna Laugher, Florian Bruhin and others"
-        ),
-        entry_points={"console_scripts": ["pytest=pytest:main", "py.test=pytest:main"]},
+        version=get_version(),
+        url='http://pytest.org',
+        license='MIT license',
+        platforms=['unix', 'linux', 'osx', 'cygwin', 'win32'],
+        author='Holger Krekel, Bruno Oliveira, Ronny Pfannschmidt, Floris Bruynooghe, Brianna Laugher, Florian Bruhin and others',
+        author_email='holger at merlinux.eu',
+        entry_points=make_entry_points(),
         classifiers=classifiers,
-        keywords="test unittest",
+        cmdclass={'test': PyTest},
         # the following should be enabled for release
-        setup_requires=["setuptools-scm"],
-        package_dir={"": "src"},
-        python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
         install_requires=install_requires,
         extras_require=extras_require,
-        packages=[
-            "_pytest",
-            "_pytest.assertion",
-            "_pytest._code",
-            "_pytest.mark",
-            "_pytest.config",
-        ],
-        py_modules=["pytest"],
+        packages=['_pytest', '_pytest.assertion', '_pytest._code', '_pytest.vendored_packages'],
+        py_modules=['pytest'],
         zip_safe=False,
     )
 
 
-if __name__ == "__main__":
+def cmdline_entrypoints(versioninfo, platform, basename):
+    target = 'pytest:main'
+    if platform.startswith('java'):
+        points = {'py.test-jython': target}
+    else:
+        if basename.startswith('pypy'):
+            points = {'py.test-%s' % basename: target}
+        else: # cpython
+            points = {'py.test-%s.%s' % versioninfo[:2] : target}
+        points['py.test'] = target
+    return points
+
+
+def make_entry_points():
+    basename = os.path.basename(sys.executable)
+    points = cmdline_entrypoints(sys.version_info, sys.platform, basename)
+    keys = list(points.keys())
+    keys.sort()
+    l = ['%s = %s' % (x, points[x]) for x in keys]
+    return {'console_scripts': l}
+
+
+class PyTest(Command):
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        import subprocess
+        PPATH = [x for x in os.environ.get('PYTHONPATH', '').split(':') if x]
+        PPATH.insert(0, os.getcwd())
+        os.environ['PYTHONPATH'] = ':'.join(PPATH)
+        errno = subprocess.call([sys.executable, 'pytest.py', '--ignore=doc'])
+        raise SystemExit(errno)
+
+
+if __name__ == '__main__':
     main()

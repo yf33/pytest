@@ -3,62 +3,37 @@
 Full pytest documentation
 ===========================
 
-`Download latest version as PDF <https://media.readthedocs.org/pdf/pytest/latest/pytest.pdf>`_
+`Download latest version as PDF <pytest.pdf>`_
 
 .. `Download latest version as EPUB <http://media.readthedocs.org/epub/pytest/latest/pytest.epub>`_
 
 .. toctree::
    :maxdepth: 2
 
-   getting-started
-   usage
-   existingtestsuite
-   assert
-   fixture
-   mark
+   overview
+   apiref
+   example/index
    monkeypatch
    tmpdir
    capture
-   warnings
-   doctest
-   skipping
-   parametrize
+   recwarn
    cache
-   unittest
-   nose
-   xunit_setup
    plugins
-   writing_plugins
-   logging
-   reference
 
-   goodpractices
-   pythonpath
-   customize
-   example/index
-   bash-completion
-
-   backwards-compatibility
-   historical-notes
-   license
    contributing
-   development_guide
    talks
-   projects
-   faq
-   contact
 
 .. only:: html
 
    .. toctree::
-      :maxdepth: 1
 
+      funcarg_compare
       announce/index
 
 .. only:: html
 
    .. toctree::
       :hidden:
-      :maxdepth: 1
 
       changelog
+

@@ -4,3 +4,4 @@ def test_exception_syntax():
         0/0
     except ZeroDivisionError, e:
         pass
+

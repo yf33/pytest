@@ -6,45 +6,7 @@ Release announcements
    :maxdepth: 2
 
 
-   release-3.7.4
-   release-3.7.3
-   release-3.7.2
-   release-3.7.1
-   release-3.7.0
-   release-3.6.4
-   release-3.6.3
-   release-3.6.2
-   release-3.6.1
-   release-3.6.0
-   release-3.5.1
-   release-3.5.0
-   release-3.4.2
-   release-3.4.1
-   release-3.4.0
-   release-3.3.2
-   release-3.3.1
-   release-3.3.0
-   release-3.2.5
-   release-3.2.4
-   release-3.2.3
-   release-3.2.2
-   release-3.2.1
-   release-3.2.0
-   release-3.1.3
-   release-3.1.2
-   release-3.1.1
-   release-3.1.0
-   release-3.0.7
-   release-3.0.6
-   release-3.0.5
-   release-3.0.4
-   release-3.0.3
-   release-3.0.2
-   release-3.0.1
-   release-3.0.0
    sprint2016
-   release-2.9.2
-   release-2.9.1
    release-2.9.0
    release-2.8.7
    release-2.8.6
@@ -83,3 +45,4 @@ Release announcements
    release-2.0.2
    release-2.0.1
    release-2.0.0
+

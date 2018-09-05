@@ -1,4 +1,7 @@
 [run]
-source = _pytest,testing
-parallel = 1
-branch = 1
+omit = 
+    # standlonetemplate is read dynamically and tested by test_genscript
+    *standalonetemplate.py
+    # oldinterpret could be removed, as it is no longer used in py26+
+    *oldinterpret.py
+    vendored_packages

@@ -5,7 +5,7 @@ Setting up bash completion
 ==========================
 
 When using bash as your shell, ``pytest`` can use argcomplete
-(https://argcomplete.readthedocs.io/) for auto-completion.
+(https://argcomplete.readthedocs.org/) for auto-completion.
 For this ``argcomplete`` needs to be installed **and** enabled.
 
 Install argcomplete using::
@@ -14,12 +14,15 @@ Install argcomplete using::
 
 For global activation of all argcomplete enabled python applications run::
 
-    sudo activate-global-python-argcomplete
+	sudo activate-global-python-argcomplete
 
 For permanent (but not global) ``pytest`` activation, use::
 
-        register-python-argcomplete pytest >> ~/.bashrc
+        register-python-argcomplete py.test >> ~/.bashrc
 
 For one-time activation of argcomplete for ``pytest`` only, use::
 
-        eval "$(register-python-argcomplete pytest)"
+        eval "$(register-python-argcomplete py.test)"
+
+
+
