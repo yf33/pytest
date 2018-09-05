@@ -1,19 +1,16 @@
 
 import pytest
 
-
 @pytest.fixture("session")
 def setup(request):
     setup = CostlySetup()
-    yield setup
-    setup.finalize()
+    request.addfinalizer(setup.finalize)
+    return setup
 
-
-class CostlySetup(object):
+class CostlySetup:
     def __init__(self):
         import time
-
-        print("performing costly setup")
+        print ("performing costly setup")
         time.sleep(5)
         self.timecostly = 1
 

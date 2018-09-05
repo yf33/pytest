@@ -1,98 +1,83 @@
-.. image:: https://docs.pytest.org/en/latest/_static/pytest1.png
-   :target: https://docs.pytest.org/en/latest/
+.. image:: http://pytest.org/latest/_static/pytest1.png
+   :target: http://pytest.org
    :align: center
    :alt: pytest
-
 
 ------
 
 .. image:: https://img.shields.io/pypi/v/pytest.svg
-    :target: https://pypi.org/project/pytest/
-
-.. image:: https://img.shields.io/conda/vn/conda-forge/pytest.svg
-    :target: https://anaconda.org/conda-forge/pytest
-
+   :target: https://pypi.python.org/pypi/pytest
 .. image:: https://img.shields.io/pypi/pyversions/pytest.svg
-    :target: https://pypi.org/project/pytest/
-
+  :target: https://pypi.python.org/pypi/pytest
 .. image:: https://img.shields.io/coveralls/pytest-dev/pytest/master.svg
-    :target: https://coveralls.io/r/pytest-dev/pytest
-
+   :target: https://coveralls.io/r/pytest-dev/pytest
 .. image:: https://travis-ci.org/pytest-dev/pytest.svg?branch=master
     :target: https://travis-ci.org/pytest-dev/pytest
-
 .. image:: https://ci.appveyor.com/api/projects/status/mrgbjaua7t33pg6b?svg=true
     :target: https://ci.appveyor.com/project/pytestbot/pytest
 
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-  :target: https://github.com/ambv/black
-
-.. image:: https://www.codetriage.com/pytest-dev/pytest/badges/users.svg
-    :target: https://www.codetriage.com/pytest-dev/pytest
-
 The ``pytest`` framework makes it easy to write small tests, yet
-scales to support complex functional testing for applications and libraries.
+scales to support complex functional testing for applications and libraries.    
 
 An example of a simple test:
 
 .. code-block:: python
 
     # content of test_sample.py
-    def inc(x):
+    def func(x):
         return x + 1
 
-
     def test_answer():
-        assert inc(3) == 5
+        assert func(3) == 5
 
 
 To execute it::
 
-    $ pytest
-    ============================= test session starts =============================
+    $ py.test
+    ======= test session starts ========
+    platform linux -- Python 3.4.3, pytest-2.8.5, py-1.4.31, pluggy-0.3.1    
     collected 1 items
 
     test_sample.py F
 
-    ================================== FAILURES ===================================
-    _________________________________ test_answer _________________________________
+    ======= FAILURES ========
+    _______ test_answer ________
 
         def test_answer():
-    >       assert inc(3) == 5
+    >       assert func(3) == 5
     E       assert 4 == 5
-    E        +  where 4 = inc(3)
+    E        +  where 4 = func(3)
 
     test_sample.py:5: AssertionError
-    ========================== 1 failed in 0.04 seconds ===========================
+    ======= 1 failed in 0.12 seconds ========
 
-
-Due to ``pytest``'s detailed assertion introspection, only plain ``assert`` statements are used. See `getting-started <https://docs.pytest.org/en/latest/getting-started.html#our-first-test-run>`_ for more examples.
-
+Due to ``py.test``'s detailed assertion introspection, only plain ``assert`` statements are used. See `getting-started <http://pytest.org/latest/getting-started.html#our-first-test-run>`_ for more examples.
+        
 
 Features
 --------
 
-- Detailed info on failing `assert statements <https://docs.pytest.org/en/latest/assert.html>`_ (no need to remember ``self.assert*`` names);
+- Detailed info on failing `assert statements <http://pytest.org/latest/assert.html>`_ (no need to remember ``self.assert*`` names);
 
 - `Auto-discovery
-  <https://docs.pytest.org/en/latest/goodpractices.html#python-test-discovery>`_
+  <http://pytest.org/latest/goodpractices.html#python-test-discovery>`_
   of test modules and functions;
 
-- `Modular fixtures <https://docs.pytest.org/en/latest/fixture.html>`_ for
+- `Modular fixtures <http://pytest.org/latest/fixture.html>`_  for
   managing small or parametrized long-lived test resources;
 
-- Can run `unittest <https://docs.pytest.org/en/latest/unittest.html>`_ (or trial),
-  `nose <https://docs.pytest.org/en/latest/nose.html>`_ test suites out of the box;
+- Can run `unittest <http://pytest.org/latest/unittest.html>`_ (or trial),
+  `nose <http://pytest.org/latest/nose.html>`_ test suites out of the box;
 
-- Python 2.7, Python 3.4+, PyPy 2.3, Jython 2.5 (untested);
+- Python2.6+, Python3.2+, PyPy-2.3, Jython-2.5 (untested);
 
-- Rich plugin architecture, with over 315+ `external plugins <http://plugincompat.herokuapp.com>`_ and thriving community;
+- Rich plugin architecture, with over 150+ `external plugins <http://pytest.org/latest/plugins.html#installing-external-plugins-searching>`_ and thriving community;
 
 
 Documentation
 -------------
 
-For full documentation, including installation, tutorials and PDF documents, please see https://docs.pytest.org/en/latest/.
+For full documentation, including installation, tutorials and PDF documents, please see http://pytest.org.
 
 
 Bugs/Requests
@@ -104,13 +89,13 @@ Please use the `GitHub issue tracker <https://github.com/pytest-dev/pytest/issue
 Changelog
 ---------
 
-Consult the `Changelog <https://docs.pytest.org/en/latest/changelog.html>`__ page for fixes and enhancements of each version.
+Consult the `Changelog <http://pytest.org/latest/changelog.html>`_ page for fixes and enhancements of each version.
 
 
 License
 -------
 
-Copyright Holger Krekel and others, 2004-2018.
+Copyright Holger Krekel and others, 2004-2016.
 
 Distributed under the terms of the `MIT`_ license, pytest is free and open source software.
 

@@ -6,16 +6,16 @@
 .. _`pytest_nose`: plugin/nose.html
 .. _`reStructured Text`: http://docutils.sourceforge.net
 .. _`Python debugger`: http://docs.python.org/lib/module-pdb.html
-.. _nose: https://nose.readthedocs.io/en/latest/
-.. _pytest: https://pypi.org/project/pytest/
+.. _nose: https://nose.readthedocs.org/en/latest/
+.. _pytest: http://pypi.python.org/pypi/pytest
 .. _mercurial: http://mercurial.selenic.com/wiki/
-.. _`setuptools`: https://pypi.org/project/setuptools/
+.. _`setuptools`: http://pypi.python.org/pypi/setuptools
 .. _`easy_install`:
 .. _`distribute docs`:
-.. _`distribute`: https://pypi.org/project/distribute/
-.. _`pip`: https://pypi.org/project/pip/
-.. _`virtualenv`: https://pypi.org/project/virtualenv/
+.. _`distribute`: http://pypi.python.org/pypi/distribute
+.. _`pip`: http://pypi.python.org/pypi/pip
+.. _`virtualenv`: http://pypi.python.org/pypi/virtualenv
 .. _hudson: http://hudson-ci.org/
 .. _jenkins: http://jenkins-ci.org/
 .. _tox: http://testrun.org/tox
-.. _pylib: https://py.readthedocs.io/en/latest/
+.. _pylib: http://py.readthedocs.org/en/latest/

@@ -4,27 +4,6 @@
 Good Integration Practices
 =================================================
 
-Install package with pip
--------------------------------------------------
-
-For development, we recommend to use virtualenv_ environments and pip_
-for installing your application and any dependencies
-as well as the ``pytest`` package itself. This ensures your code and
-dependencies are isolated from the system Python installation.
-
-First you need to place a ``setup.py`` file in the root of your package with the following minimum content::
-
-    from setuptools import setup, find_packages
-
-    setup(name="PACKAGENAME", packages=find_packages())
-
-Where ``PACKAGENAME`` is the name of your package. You can then install your package in "editable" mode by running from the same directory::
-
-     pip install -e .
-
-which lets you change your source code (both tests and application) and rerun tests at will.
-This is similar to running ``python setup.py develop`` or ``conda develop`` in that it installs
-your package using a symlink to your development code.
 
 .. _`test discovery`:
 .. _`Python test discovery`:
@@ -37,12 +16,10 @@ Conventions for Python test discovery
 * If no arguments are specified then collection starts from :confval:`testpaths`
   (if configured) or the current directory. Alternatively, command line arguments
   can be used in any combination of directories, file names or node ids.
-* Recurse into directories, unless they match :confval:`norecursedirs`.
-* In those directories, search for ``test_*.py`` or ``*_test.py`` files, imported by their `test package name`_.
-* From those files, collect test items:
-
-  * ``test_`` prefixed test functions or methods outside of class
-  * ``test_`` prefixed test functions or methods inside ``Test`` prefixed test classes (without an ``__init__`` method)
+* recurse into directories, unless they match :confval:`norecursedirs`
+* ``test_*.py`` or ``*_test.py`` files, imported by their `test package name`_.
+* ``Test`` prefixed test classes (without an ``__init__`` method)
+* ``test_`` prefixed test functions or methods are test items
 
 For examples of how to customize your test discovery :doc:`example/pythoncollection`.
 
@@ -51,106 +28,68 @@ Within Python modules, ``pytest`` also discovers tests using the standard
 
 
 Choosing a test layout / import rules
--------------------------------------
+------------------------------------------
 
 ``pytest`` supports two common test layouts:
 
-Tests outside application code
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* putting tests into an extra directory outside your actual application
+  code, useful if you have many functional tests or for other reasons
+  want to keep tests separate from actual application code (often a good
+  idea)::
 
-Putting tests into an extra directory outside your actual application code
-might be useful if you have many functional tests or for other reasons want
-to keep tests separate from actual application code (often a good idea)::
-
-    setup.py
+    setup.py   # your setuptools Python package metadata
     mypkg/
         __init__.py
-        app.py
-        view.py
+        appmodule.py
     tests/
         test_app.py
-        test_view.py
         ...
 
-This way your tests can run easily against an installed version
-of ``mypkg``.
 
-Note that using this scheme your test files must have **unique names**, because
-``pytest`` will import them as *top-level* modules since there are no packages
-to derive a full package name from. In other words, the test files in the example above will
-be imported as ``test_app`` and ``test_view`` top-level modules by adding ``tests/`` to
-``sys.path``.
+* inlining test directories into your application package, useful if you
+  have direct relation between (unit-)test and application modules and
+  want to distribute your tests along with your application::
 
-If you need to have test modules with the same name, you might add ``__init__.py`` files to your
-``tests`` folder and subfolders, changing them to packages::
-
-    setup.py
+    setup.py   # your setuptools Python package metadata
     mypkg/
+        __init__.py
+        appmodule.py
         ...
-    tests/
-        __init__.py
-        foo/
-            __init__.py
-            test_view.py
-        bar/
-            __init__.py
-            test_view.py
-
-Now pytest will load the modules as ``tests.foo.test_view`` and ``tests.bar.test_view``, allowing
-you to have modules with the same name. But now this introduces a subtle problem: in order to load
-the test modules from the ``tests`` directory, pytest prepends the root of the repository to
-``sys.path``, which adds the side-effect that now ``mypkg`` is also importable.
-This is problematic if you are using a tool like `tox`_ to test your package in a virtual environment,
-because you want to test the *installed* version of your package, not the local code from the repository.
-
-In this situation, it is **strongly** suggested to use a ``src`` layout where application root package resides in a
-sub-directory of your root::
-
-    setup.py
-    src/
-        mypkg/
-            __init__.py
-            app.py
-            view.py
-    tests/
-        __init__.py
-        foo/
-            __init__.py
-            test_view.py
-        bar/
-            __init__.py
-            test_view.py
-
-
-This layout prevents a lot of common pitfalls and has many benefits, which are better explained in this excellent
-`blog post by Ionel Cristian Mărieș <https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure>`_.
-
-Tests as part of application code
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Inlining test directories into your application package
-is useful if you have direct relation between tests and application modules and
-want to distribute them along with your application::
-
-    setup.py
-    mypkg/
-        __init__.py
-        app.py
-        view.py
         test/
-            __init__.py
             test_app.py
-            test_view.py
             ...
 
-In this scheme, it is easy to run your tests using the ``--pyargs`` option::
+Important notes relating to both schemes:
 
-    pytest --pyargs mypkg
+- **make sure that "mypkg" is importable**, for example by typing once::
 
-``pytest`` will discover where ``mypkg`` is installed and collect tests from there.
+     pip install -e .   # install package using setup.py in editable mode
 
-Note that this layout also works in conjunction with the ``src`` layout mentioned in the previous section.
+- **avoid "__init__.py" files in your test directories**.
+  This way your tests can run easily against an installed version
+  of ``mypkg``, independently from the installed package if it contains
+  the tests or not.
 
+- With inlined tests you might put ``__init__.py`` into test
+  directories and make them installable as part of your application.
+  Using the ``py.test --pyargs mypkg`` invocation pytest will
+  discover where mypkg is installed and collect tests from there.
+  With the "external" test you can still distribute tests but they
+  will not be installed or become importable.
+
+Typically you can run tests by pointing to test directories or modules::
+
+    py.test tests/test_app.py       # for external test dirs
+    py.test mypkg/test/test_app.py  # for inlined test dirs
+    py.test mypkg                   # run tests in all below test directories
+    py.test                         # run all tests below current dir
+    ...
+
+Because of the above ``editable install`` mode you can change your
+source code (both tests and the app) and rerun tests at will.
+Once you are done with your work, you can `use tox`_ to make sure
+that the package is really correct and tests pass in all
+required configurations.
 
 .. note::
 
@@ -166,7 +105,7 @@ Note that this layout also works in conjunction with the ``src`` layout mentione
 
 .. note::
 
-    If ``pytest`` finds an "a/b/test_module.py" test file while
+    If ``pytest`` finds a "a/b/test_module.py" test file while
     recursing into the filesystem it determines the import name
     as follows:
 
@@ -186,34 +125,44 @@ Note that this layout also works in conjunction with the ``src`` layout mentione
     The reason for this somewhat evolved importing technique is
     that in larger projects multiple test modules might import
     from each other and thus deriving a canonical import name helps
-    to avoid surprises such as a test module getting imported twice.
+    to avoid surprises such as a test modules getting imported twice.
 
 
-.. _`virtualenv`: https://pypi.org/project/virtualenv/
+.. _`virtualenv`: http://pypi.python.org/pypi/virtualenv
 .. _`buildout`: http://www.buildout.org/
-.. _pip: https://pypi.org/project/pip/
+.. _pip: http://pypi.python.org/pypi/pip
 
 .. _`use tox`:
 
-tox
+Tox
 ------
 
-Once you are done with your work and want to make sure that your actual
+For development, we recommend to use virtualenv_ environments and pip_
+for installing your application and any dependencies
+as well as the ``pytest`` package itself. This ensures your code and
+dependencies are isolated from the system Python installation.
+
+If you frequently release code and want to make sure that your actual
 package passes all tests you may want to look into `tox`_, the
 virtualenv test automation tool and its `pytest support
-<https://tox.readthedocs.io/en/latest/example/pytest.html>`_.
-tox helps you to setup virtualenv environments with pre-defined
+<http://testrun.org/tox/latest/example/pytest.html>`_.
+Tox helps you to setup virtualenv environments with pre-defined
 dependencies and then executing a pre-configured test command with
 options.  It will run tests against the installed package and not
 against your source code checkout, helping to detect packaging
 glitches.
+
+Continuous integration services such as Jenkins_ can make use of the
+``--junitxml=PATH`` option to create a JUnitXML file and generate reports (e.g.
+by publishing the results in a nice format with the `Jenkins xUnit Plugin
+<https://wiki.jenkins-ci.org/display/JENKINS/xUnit+Plugin>`_).
 
 
 Integrating with setuptools / ``python setup.py test`` / ``pytest-runner``
 --------------------------------------------------------------------------
 
 You can integrate test runs into your setuptools based project
-with the `pytest-runner <https://pypi.org/project/pytest-runner/>`_ plugin.
+with the `pytest-runner <https://pypi.python.org/pypi/pytest-runner>`_ plugin.
 
 Add this to ``setup.py`` file:
 
@@ -222,10 +171,10 @@ Add this to ``setup.py`` file:
     from setuptools import setup
 
     setup(
-        # ...,
-        setup_requires=["pytest-runner", ...],
-        tests_require=["pytest", ...],
-        # ...,
+        #...,
+        setup_requires=['pytest-runner', ...],
+        tests_require=['pytest', ...],
+        #...,
     )
 
 
@@ -244,17 +193,8 @@ If you now type::
 this will execute your tests using ``pytest-runner``. As this is a
 standalone version of ``pytest`` no prior installation whatsoever is
 required for calling the test command. You can also pass additional
-arguments to pytest such as your test directory or other
+arguments to py.test such as your test directory or other
 options using ``--addopts``.
-
-You can also specify other pytest-ini options in your ``setup.cfg`` file
-by putting them into a ``[tool:pytest]`` section:
-
-.. code-block:: ini
-
-    [tool:pytest]
-    addopts = --verbose
-    python_files = testing/*/*.py
 
 
 Manual Integration
@@ -271,27 +211,24 @@ your own setuptools Test command for invoking pytest.
 
 
     class PyTest(TestCommand):
-        user_options = [("pytest-args=", "a", "Arguments to pass to pytest")]
+        user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
 
         def initialize_options(self):
             TestCommand.initialize_options(self)
-            self.pytest_args = ""
+            self.pytest_args = []
 
         def run_tests(self):
-            import shlex
-
-            # import here, cause outside the eggs aren't loaded
+            #import here, cause outside the eggs aren't loaded
             import pytest
-
-            errno = pytest.main(shlex.split(self.pytest_args))
+            errno = pytest.main(self.pytest_args)
             sys.exit(errno)
 
 
     setup(
-        # ...,
-        tests_require=["pytest"],
-        cmdclass={"pytest": PyTest},
-    )
+        #...,
+        tests_require=['pytest'],
+        cmdclass = {'test': PyTest},
+        )
 
 Now if you run::
 
@@ -303,7 +240,41 @@ using the ``--pytest-args`` or ``-a`` command-line option. For example::
 
     python setup.py test -a "--durations=5"
 
-is equivalent to running ``pytest --durations=5``.
+is equivalent to running ``py.test --durations=5``.
+
+
+.. _standalone:
+.. _`genscript method`:
+
+(deprecated) Create a pytest standalone script
+-----------------------------------------------
+
+.. deprecated:: 2.8
+
+.. note::
+
+    ``genscript`` has been deprecated because:
+
+    * It cannot support plugins, rendering its usefulness extremely limited;
+    * Tooling has become much better since ``genscript`` was introduced;
+    * It is possible to build a zipped ``pytest`` application without the
+      shortcomings above.
+
+    There's no planned version in which this command will be removed
+    at the moment of this writing, but its use is discouraged for new
+    applications.
+
+If you are a maintainer or application developer and want people
+who don't deal with python much to easily run tests you may generate
+a standalone ``pytest`` script::
+
+    py.test --genscript=runtests.py
+
+This generates a ``runtests.py`` script which is a fully functional basic
+``pytest`` script, running unchanged under Python2 and Python3.
+You can tell people to download the script and then e.g.  run it like this::
+
+    python runtests.py
 
 
 .. include:: links.inc
